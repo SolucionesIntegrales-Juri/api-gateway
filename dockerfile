@@ -1,14 +1,20 @@
-# Imagen JDK para ejecutar Spring Boot
-FROM eclipse-temurin:17-jdk-alpine AS runtime
-
-# Crear directorio de la app
+# Etapa 1: Construcción del JAR
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copiar el JAR generado por Spring Boot
-COPY target/*.jar app.jar
+COPY pom.xml .
+RUN mvn -q -e -DskipTests dependency:resolve
 
-# Configurar puerto (Railway o Docker lo sobrescriben igual)
+COPY src ./src
+RUN mvn -q -e -DskipTests package
+
+# Etapa 2: Imagen ligera para producción
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+# Railway inyecta PORT automáticamente
 EXPOSE 8080
 
-# Ejecutar el microservicio
 ENTRYPOINT ["java", "-jar", "app.jar"]
