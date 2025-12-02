@@ -18,20 +18,20 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 
-        return http
-                .authorizeExchange(authz -> authz
-                        .pathMatchers("/authorized", "/logout").permitAll()
-                        .pathMatchers("api/users").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/clientes", "/api/vehiculos").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/clientes").hasAnyRole("ADMIN", "USER")
-                        .pathMatchers("/api/contratos/**", "/api/clientes/**").hasRole("ADMIN")
-                        .anyExchange().authenticated()
-                )
+        http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::disable) // ❌ sin OAuth2
-                .build();
+                .authorizeExchange(authz -> authz
+                        .pathMatchers("/authorized", "/logout").permitAll()
+                        .pathMatchers("/api/users").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/clientes", "/api/vehiculos").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/clientes").hasAnyRole("ADMIN", "USER")
+                        .pathMatchers("/api/contratos/**", "/api/clientes/**").hasRole("ADMIN")
+                        .anyExchange().permitAll() // si aun no usas JWT
+                );
+
+        return http.build();
     }
 
     @Bean
