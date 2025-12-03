@@ -1,14 +1,10 @@
-# Usa una imagen de Java runtime
-FROM eclipse-temurin:17-jre-alpine
-
-# Crea el directorio de la app
+FROM maven:3.8.8-openjdk-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn -B -DskipTests package
 
-# Copia el jar compilado al contenedor
-COPY target/*.jar app.jar
-
-# Expone el puerto (ajusta al utilizado por tu app)
-EXPOSE 8080
-
-# Comando de ejecución con archivo jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM eclipse-temurin:17-jre
+ARG JAR_FILE=target/*.jar
+COPY --from=build /app/${JAR_FILE} /app/app.jar
+ENTRYPOINT ["java","-jar","/app/app.jar"]
