@@ -1,20 +1,14 @@
-# Etapa 1: Construcción del JAR
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Usa una imagen de Java runtime
+FROM eclipse-temurin:17-jre-alpine
+
+# Crea el directorio de la app
 WORKDIR /app
 
-COPY pom.xml .
-RUN mvn -q -e -DskipTests dependency:resolve
+# Copia el jar compilado al contenedor
+COPY target/*.jar app.jar
 
-COPY src ./src
-RUN mvn -q -e -DskipTests package
-
-# Etapa 2: Imagen ligera para producción
-FROM eclipse-temurin:17-jdk-alpine
-WORKDIR /app
-
-COPY --from=build /app/target/*.jar app.jar
-
-# Railway inyecta PORT automáticamente
+# Expone el puerto (ajusta al utilizado por tu app)
 EXPOSE 8080
 
+# Comando de ejecución con archivo jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
