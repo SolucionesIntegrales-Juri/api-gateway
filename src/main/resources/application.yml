@@ -1,82 +1,67 @@
 spring:
+  application:
+    name: api-gateway
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://msvc-oauth:9100
-
-
-      #client:
-       # registration:
-        #  client-app:
-         #   provider: spring
-          #  client-id: gateway-app
-           # client-secret: 12345
-            #authorization-grant-type: authorization_code
-            #redirect-uri: http://api-gateway:8090/authorized
-            #scope:
-             # - openid
-              #- profile
-            #client-name: client-app
-        #provider:
-         # spring:
-          #  issuer-uri: http://msvc-oauth:9100
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            - id: msvc-oauth
-              uri: lb://msvc-oauth
-              predicates:
-                - Path=/api/security/**
-              filters:
-                - StripPrefix=2
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: msvc-oauth
+          uri: lb://msvc-oauth
+          predicates:
+            - Path=/api/security/**
+          filters:
+            - StripPrefix=1
 
-            - id: msvc-users
-              uri: lb://msvc-users
-              predicates:
-                - Path=/api/users/**
+        - id: msvc-users
+          uri: lb://msvc-users
+          predicates:
+            - Path=/api/users/**
 
-            - id: msvc-clientes
-              uri: lb://msvc-clientes
-              predicates:
-                - Path=/api/clientes/**
+        - id: msvc-clientes
+          uri: lb://msvc-clientes
+          predicates:
+            - Path=/api/clientes/**
 
-            - id: msvc-veh-vehiculos
-              uri: lb://msvc-vehiculos
-              predicates:
-                - Path=/api/vehiculos/**
-            - id: msvc-veh-modelos
-              uri: lb://msvc-vehiculos
-              predicates:
-                - Path=/api/modelos/**
-            - id: msvc-veh-marcas
-              uri: lb://msvc-vehiculos
-              predicates:
-                - Path=/api/marcas/**
-            - id: msvc-veh-mantenimientos
-              uri: lb://msvc-vehiculos
-              predicates:
-                - Path=/api/mantenimientos/**
-            - id: msvc-veh-tipos-vehiculo
-              uri: lb://msvc-vehiculos
-              predicates:
-                - Path=/api/tipos-vehiculo/**
+        - id: msvc-vehiculos
+          uri: lb://msvc-vehiculos
+          predicates:
+            - Path=/api/vehiculos/**,/api/modelos/**,/api/marcas/**,/api/tipos-vehiculo/**
 
-            - id: msvc-cont-contratos
-              uri: lb://msvc-contratos
-              predicates:
-                - Path=/api/contratos/**
-            - id: msvc-cont-comprobantes
-              uri: lb://msvc-contratos
-              predicates:
-                - Path=/api/comprobantes/**
+        - id: msvc-contratos
+          uri: lb://msvc-contratos
+          predicates:
+            - Path=/api/contratos/**,/api/comprobantes/**
 
-            - id: msvc-reportes
-              uri: lb://msvc-reportes
-              predicates:
-                - Path=/api/reportes/**
+        - id: msvc-reportes
+          uri: lb://msvc-reportes
+          predicates:
+            - Path=/api/reportes/**
+
+server:
+  port: 8090
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    hostname: api-gateway
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
 logging:
   level:
-    org.springframework.cloud.gateway.server.mvc: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
