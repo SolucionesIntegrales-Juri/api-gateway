@@ -17,8 +17,6 @@ spring:
           uri: lb://msvc-oauth
           predicates:
             - Path=/api/security/**
-          filters:
-            - StripPrefix=1
 
         - id: msvc-users
           uri: lb://msvc-users
