@@ -4,21 +4,23 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://msvc-oauth:9100
-      client:
-        registration:
-          client-app:
-            provider: spring
-            client-id: gateway-app
-            client-secret: 12345
-            authorization-grant-type: authorization_code
-            redirect-uri: http://api-gateway:8090/authorized
-            scope:
-              - openid
-              - profile
-            client-name: client-app
-        provider:
-          spring:
-            issuer-uri: http://msvc-oauth:9100
+
+
+      #client:
+       # registration:
+        #  client-app:
+         #   provider: spring
+          #  client-id: gateway-app
+           # client-secret: 12345
+            #authorization-grant-type: authorization_code
+            #redirect-uri: http://api-gateway:8090/authorized
+            #scope:
+             # - openid
+              #- profile
+            #client-name: client-app
+        #provider:
+         # spring:
+          #  issuer-uri: http://msvc-oauth:9100
   cloud:
     gateway:
       server:
