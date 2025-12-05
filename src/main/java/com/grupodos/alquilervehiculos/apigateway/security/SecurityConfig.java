@@ -65,7 +65,14 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://127.0.0.1:3000",
-                "http://127.0.0.1:5173"
+                "http://127.0.0.1:5173",
+
+                //Produccion - VPS
+                "http://138.68.2.13:8090",
+                "http://api-gateway:8090",
+
+                //Produccion - Vercel
+                "https://fronted1-pearl.vercel.app/login"
         ));
 
         corsConfig.setAllowedMethods(Arrays.asList(
