@@ -22,7 +22,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;;
+import java.util.stream.Collectors;
 
 @Configuration
 public class SecurityConfig {
@@ -37,9 +37,8 @@ public class SecurityConfig {
                             //.pathMatchers(HttpMethod.POST, "/api/clientes").hasAnyRole("ADMIN", "USER")
                             //.pathMatchers("/api/contratos/**", "/api/clientes/**").hasRole("ADMIN")
                             .anyExchange().authenticated();
-                }).cors(csrf -> csrf.disable())
-                .oauth2Login(withDefaults())
-                .oauth2Client(withDefaults())
+                }).csrf(csrf -> csrf.disable())
+                // Eliminado .oauth2Login() y .oauth2Client() porque solo validamos JWT
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(new Converter<Jwt, Mono<AbstractAuthenticationToken>>() {
                             @Override
@@ -49,7 +48,7 @@ public class SecurityConfig {
                                         .map(SimpleGrantedAuthority::new)
                                         .collect(Collectors.toList());
 
-                                        return Mono.just(new JwtAuthenticationToken(source, authorities));
+                                return Mono.just(new JwtAuthenticationToken(source, authorities));
                             }
                         })
                 ))
@@ -60,7 +59,7 @@ public class SecurityConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
 
-        // SOLO ViteReact - ambos puertos comunes
+        // Desarrollo local + Producción
         corsConfig.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:5173",
@@ -71,8 +70,8 @@ public class SecurityConfig {
                 "http://138.68.2.13:8090",
                 "http://api-gateway:8090",
 
-                //Produccion - Vercel
-                "https://fronted1-pearl.vercel.app/login"
+                //Produccion - Vercel (sin /login al final)
+                "https://fronted1-pearl.vercel.app"
         ));
 
         corsConfig.setAllowedMethods(Arrays.asList(
